@@ -1,5 +1,6 @@
+{% load cart_template_tags%}
 <!-- Navbar -->
-<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar pt-5">
+<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar pt-5 mb-3">
     <div class="container ">
 
     <!-- Brand -->
@@ -26,20 +27,21 @@
         <li class="nav-item">
         <a class="nav-link waves-effect" href="https://mdbootstrap.com/docs/jquery/" target="_blank">Login</a>
         </li>
-        <li class="nav-item">
-        <a class="nav-link waves-effect" href="https://mdbootstrap.com/docs/jquery/getting-started/download/"
-            target="_blank">Profile</a>
-        </li>
-        <li class="nav-item">
-        <a class="nav-link waves-effect" href="https://mdbootstrap.com/education/bootstrap/" target="_blank">Log out</a>
-        </li>
+{% if  request.user.is_authenticated%}
+            <li class="nav-item">
+            <a class="nav-link waves-effect" href="https://mdbootstrap.com/docs/jquery/getting-started/download/"
+                target="_blank">Profile</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link waves-effect" href="https://mdbootstrap.com/education/bootstrap/" target="_blank">Log out</a>
+            </li>
     </ul>
 
     <!-- Right -->
     <ul class="navbar-nav nav-flex-icons">
         <li class="nav-item">
-        <a class="nav-link waves-effect">
-            <span class="badge red z-depth-1 mr-1"> 1 </span>
+        <a class="nav-link waves-effect" href="{% url 'order-summary'%}">
+            <span class="badge red z-depth-1 mr-1"> {{request.user| cart_item_count}}</span>
             <i class="fas fa-shopping-cart"></i>
             <span class="clearfix d-none d-sm-inline-block"> Cart </span>
         </a>
@@ -47,13 +49,14 @@
         
     
         <li class="nav-item">
-            <a class="nav-link waves-effect" href="https://mdbootstrap.com/education/bootstrap/" target="_blank">Product</a>
+            <a class="nav-link waves-effect" href="#" target="_blank">Product</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link waves-effect" href="https://mdbootstrap.com/education/bootstrap/" target="_blank">Check Out</a>
+            <a class="nav-link waves-effect" href="{% url 'checkout-page'%}" target="_blank">CheckOut</a>
         </li>
     
     </ul>
+{% endif %}
 
     </div>
 
