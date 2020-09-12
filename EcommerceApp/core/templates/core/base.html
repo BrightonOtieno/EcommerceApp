@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load cart_template_tags%}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,6 +14,8 @@
 <link href="{% static 'core/css/bootstrap.min.css' %}" rel="stylesheet">
 <!-- Material Design Bootstrap -->
 <link href="{% static 'core/css/mdb.min.css' %}" rel="stylesheet">
+{% block extra_links%}
+{% endblock extra_links%}
 <!-- Your custom styles (optional) -->
 
 <style type="text/css">

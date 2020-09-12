@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
-
+from django_countries.fields import CountryField
 
 # Create your models here.
 CATEGORY_CHOICES = (
@@ -28,6 +28,7 @@ class Item(models.Model):
     state= models.CharField(choices=SALE_STATE_CHOICES, max_length=2,default="N")
     discount_price = models.FloatField(blank=True,null=True)
     description = models.TextField()
+    image = models.ImageField(upload_to = 'product_images')
 
     # Absolute url for product/item detail
     def get_absolute_url(self):
@@ -68,9 +69,15 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} of {self.item.title}"
+
+class Coupon(models.Model):
+    code =  models.CharField( max_length=20)
+    amount  = models.FloatField()
+
+    def __str__(self):
+        return self.code
+
     
-
-
 
 class Order(models.Model):
     user = models.ForeignKey(User,  on_delete=models.CASCADE)
@@ -78,21 +85,46 @@ class Order(models.Model):
     start_date = models.DateTimeField( auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
-
+    billing_address = models.ForeignKey('BillingAddress',on_delete=models.SET_NULL,blank=True,null=True)
+    payment = models.ForeignKey('Payment',on_delete=models.SET_NULL,blank=True,null=True)
+    coupon =  models.ForeignKey('Coupon',on_delete=models.SET_NULL,blank=True,null=True)
+    
 
 
     def get_total(self):
         total = 0
         for order_item in self.items.all():
             total += order_item.get_final_price()
-        
-        return total
+        #if self.coupon.code =="FIRST_TIME_CLIENT":
+        #total -=20
 
+        print(total)
+
+        return  total
 
 
     def __str__(self):
         return self.user.username
     
 
+class BillingAddress(models.Model):
+    user = models.ForeignKey(User,  on_delete=models.CASCADE)
+    street_address = models.CharField( max_length=100)
+    zip_code = models.CharField( max_length=100)
+    country = CountryField(multiple=False)
+    apartment_address = models.CharField( max_length=100)
 
+
+    def  __str__(self):
+        return self.user.username
+
+class Payment(models.Model):
+    stripe_charge_id = models.CharField( max_length=50)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL,blank=True,null=True)
+    amount  = models.FloatField()
+    timestamp = models.DateTimeField( auto_now_add=True)
+
+
+    def __str__(self):
+        return self.user.username
     
