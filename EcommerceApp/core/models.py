@@ -82,21 +82,25 @@ class Coupon(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User,  on_delete=models.CASCADE)
     items = models.ManyToManyField(OrderItem)
+    ref_code = models.CharField( max_length=20)
     start_date = models.DateTimeField( auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     billing_address = models.ForeignKey('BillingAddress',on_delete=models.SET_NULL,blank=True,null=True)
     payment = models.ForeignKey('Payment',on_delete=models.SET_NULL,blank=True,null=True)
     coupon =  models.ForeignKey('Coupon',on_delete=models.SET_NULL,blank=True,null=True)
-    
+    being_delivered = models.BooleanField(default=False)
+    received = models.BooleanField(default=False)
+    refund_request = models.BooleanField(default=False)
+    refund_granted = models.BooleanField(default=False)
 
 
     def get_total(self):
         total = 0
         for order_item in self.items.all():
             total += order_item.get_final_price()
-        #if self.coupon.code =="FIRST_TIME_CLIENT":
-        #total -=20
+        if self.coupon:
+            total -= self.coupon.amount
 
         print(total)
 
@@ -128,3 +132,11 @@ class Payment(models.Model):
     def __str__(self):
         return self.user.username
     
+class Refund(models.Model):
+    order  = models.ForeignKey('Order',  on_delete=models.CASCADE)
+    reason = models.TextField()
+    accepted = models.BooleanField(default=False)
+    email = models.CharField(max_length=150)
+
+    def __str__(self):
+        return f"{self.pk}"
